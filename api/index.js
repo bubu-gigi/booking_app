@@ -31,16 +31,30 @@ app.get('/test', (req,res) => {
 });
 
 app.post('/register', async (req,res) => {
-  const {name,email,password} = req.body;
-  try {
-    const user = await User.create({
-      name,
-      email,
-      password: bcrypt.hashSync(password, bcryptSalt),
-    });  
-    res.json(user);
-  } catch (e) {
-    res.status(422).json(e);
+  const {name,email:emailPut,password} = req.body;
+  if(name == "") {
+    res.json("name empty");
+  }
+  if(emailPut == "") {
+    res.json("email empty");
+  }
+  if(password == "") {
+    res.json("password empty"); 
+  }
+  const userToCheck = await User.find({email: emailPut});
+  if(userToCheck.length == 0) {
+    try {
+      const user = await User.create({
+        name,
+        emailPut,
+        password: bcrypt.hashSync(password, bcryptSalt),
+      });  
+      res.json(user);
+    } catch (e) {
+      res.status(422).json(e);
+    }
+  } else {
+    res.json("ko");
   }
 });
 
@@ -53,9 +67,11 @@ app.post('/login', async (req,res) => {
       if (pass) {
         res.cookie('id', user._id).json(user);
       } else {
-        res.json("pass not ok");
+        res.json("ko");
       }
-    } 
+    } else {
+      res.json("ko");
+    }
   } catch (e) {
     res.status(422).json(e);
   }
@@ -63,7 +79,7 @@ app.post('/login', async (req,res) => {
 
 app.get('/profile', async (req,res) => {
   const {id} = req.cookies;
-  if({id} && id != null) {
+  if({id} && id != null && id != "") {
     try {
       const user = await User.findById(id);
       res.json(user);
@@ -145,11 +161,20 @@ app.get('/user-places', async (req,res) => {
   }
 });
 
-app.get('/places/:id', async (req,res) => {
-  const {id} = req.params;
+app.get('/places/:param', async (req,res) => {
+  const {param} = req.params;
   try {
-    if (id.match(/^[0-9a-fA-F]{24}$/)) {
-      const place = await Place.findById(id);
+    if (param.match(/^[a-zA-Z-]+$/)) {
+      let result = param.replace('-', ' ');
+      result = result.split(' ');
+      for(let i=0; i < result.length; i++) {
+        result[i] = result[i].charAt(0).toLocaleUpperCase()+result[i].slice(1);
+      }
+      result = result.join(' ');
+      const place = await Place.find({ title: result });
+      res.json(place);
+    } else {
+      const place = await Place.findById(param);
       res.json(place);
     }
   } catch (e) {
@@ -186,9 +211,21 @@ app.put('/places/:id', async (req,res) => {
   }
 });
 
-app.post('/remove-photo', async(req,res) => {
-  const {filename} = req.body;
-  res.json(filename);
+app.post('/remove-photos', async(req,res) => {
+  const dirPhotos = dir + "/uploads";
+  const body = req.body;
+  fs.readdir(dirPhotos, function(err, files) {
+    if (err) throw (err);
+    files.forEach(file => {
+      body.forEach((photo) => {
+        if(file == photo) {
+          const filePath = dirPhotos + "/" + file;
+          fs.unlinkSync(filePath);
+        }
+      })
+    })
+    res.json("ok");
+  })
 });
 
 app.get('/places', async (req,res) => {
