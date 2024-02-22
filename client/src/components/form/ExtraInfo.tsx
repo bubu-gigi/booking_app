@@ -21,7 +21,7 @@ export default function ExtraInfo({ extraInfo }) {
     <>
       <h2 className="text-2xl mt-4">Extra info</h2>
       <p className="text-gray-500 text-sm">house rulse, extra</p>
-      <textarea name="extraInfo" defaultValue={extraInfo} onChange={handleExtraInfoChange}/>
+      <textarea name="extraInfo" defaultValue={extraInfo} onChange={handleExtraInfoChange} required/>
     </>
   );
 }

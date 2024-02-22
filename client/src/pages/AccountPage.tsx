@@ -7,15 +7,15 @@ import AccountNav from "../components/AccountNav.tsx";
 
 export default function AccountPage() {
     // @ts-ignore
-    const {user, setUser, ready} = useContext(UserContext);
+    const {user,isLogged,ready} = useContext(UserContext);
 
     let {subpage} = useParams();
     if (subpage === undefined) {
         subpage = 'profile';
     }
 
-    if(ready && !user) {
-        return <Navigate to={'/'} />
+    if(ready && !isLogged) {
+        return <Navigate to={'/login'} />
     }
 
     return (

@@ -10,6 +10,10 @@ import { setCheckIn, setCheckOut, setMaxGuests } from "../redux/slices/form/chec
 import AddressTitle from "./form/AddressTitle";
 import Description from "./form/Description";
 import ExtraInfo from "./form/ExtraInfo";
+import Alerts from "./Alerts";
+import { setShowTopFalse, setShowTopTrue } from "../redux/slices/alertSlice";
+import { Navigate } from "react-router-dom";
+import { setRedirectFalse } from "../redux/slices/redirectSlice";
 
 interface FormDataProps {
   title: string | null,
@@ -22,6 +26,7 @@ interface FormDataProps {
   checkOut: string | null,
   maxGuests: string | null,
   price: number | null,
+  photosRemoved: string[] | null,
 }
 
 //@ts-ignore
@@ -39,9 +44,12 @@ export default function PlacesForm( {place, id} ){
     checkOut: '',
     maxGuests: '',
     price: 0.0,
+    photosRemoved: [],
   });
 
-  
+  const redirect = useSelector((state: RootState) => state.redirect.redirect);
+  const alertState = useSelector((state: RootState) => state.alert.show);
+  const photosRemoved = useSelector((state: RootState) => state.photosRemoved.photosRemoved);
   const titleRedux = useSelector((state: RootState) => state.addtitle.title);
   const addressRedux = useSelector((state: RootState) => state.addtitle.address);
   const descriptionRedux = useSelector((state: RootState) => state.description.description);
@@ -66,13 +74,16 @@ export default function PlacesForm( {place, id} ){
     formData.maxGuests = maxGuestsRedux;
     formData.addedPhotos = photosRedux;
     formData.price = priceRedux;
+    formData.photosRemoved = photosRemoved;
     if(id && id !== 'new') {
       await dispatch(updatePlace(formData));
-      location.reload();
+      await dispatch(setShowTopTrue());
+      //location.reload();
       //return <Navigate to={'/account'} />
     }else {
       await dispatch(addNewPlace(formData));
-      location.reload();
+      await dispatch(setShowTopTrue());
+      //location.reload();
       //return <Navigate to={'/account'} />
     }
 	}
@@ -86,6 +97,8 @@ export default function PlacesForm( {place, id} ){
   }
 
   useEffect(() => {
+    dispatch(setRedirectFalse());
+    dispatch(setShowTopFalse());
     if(id === 'new') {
       dispatch(setAddedPhotos([]));
     }
@@ -96,15 +109,25 @@ export default function PlacesForm( {place, id} ){
     setFormData(place);
   }, []);
 
-  return (
-    <form>
-      <AddressTitle address={place.address} title={place.title}/>
-      <Description description={place.description} />
-      <UploadPhotos addedPhotos={place.addedPhotos}/>
-      <ExtraInfo extraInfo={place.extraInfo}/>
-      <Perks perks={place.perks} />
-      <CheckInOutGuests checkIn={place.checkIn} checkOut={place.checkOut} maxGuests={place.maxGuests} price={place.price}/>
-      <button className="primary mt-4" onClick={submitForm}>Save</button>
-    </form>
-  );
+  if(redirect) {
+    return <Navigate to={'/account/places'} />
+  }
+
+  if(!(alertState)) {
+    return (
+      <form onSubmit={submitForm}>
+        <AddressTitle address={place.address} title={place.title}/>
+        <Description description={place.description} />
+        <UploadPhotos addedPhotos={place.addedPhotos}/>
+        <ExtraInfo extraInfo={place.extraInfo}/>
+        <Perks perks={place.perks} />
+        <CheckInOutGuests checkIn={place.checkIn} checkOut={place.checkOut} maxGuests={place.maxGuests} price={place.price}/>
+        <button className="primary mt-4">Save</button>
+      </form>
+    );
+  } else {
+    return (
+      <Alerts state={"success"} payload={"Place added/uploaded successfully."}/>
+    );
+  }
 }

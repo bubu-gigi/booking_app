@@ -49,6 +49,14 @@ const photosSlice = createSlice({
       for(let i=0; i < photos.length; i++) {
         state.photos.push(photos[i]);
       }
+    }),
+    builder.addCase(removePhotoAsync.pending, () => {
+      //console.log("pending");
+    }).addCase(removePhotoAsync.rejected, () => {
+      console.error("error");
+    }).addCase(removePhotoAsync.fulfilled, (state,action) => {
+      const index = state.photos.indexOf(action.payload);
+      state.photos.splice(index, 1);
     })
   }
     /*builder.addCase(removePhotoAsync.pending, () => {
@@ -85,7 +93,7 @@ export const getPhotosAsync = createAsyncThunk(
   }
 );
 
-/*export const removePhotoAsync = createAsyncThunk(
+export const removePhotoAsync = createAsyncThunk(
   'photos/removePhoto',
   async(filename: string) => {
     try {
@@ -96,7 +104,7 @@ export const getPhotosAsync = createAsyncThunk(
       console.error(e);
     }
   }
-)*/
+)
 
 export const { setAddedPhotos,removePhotoRedux,putNewPhotos } = photosSlice.actions;
 

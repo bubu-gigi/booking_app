@@ -2,11 +2,24 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 
+interface Place {
+  title: string,
+  address: string,
+  addedPhotos: string[],
+  description: string,
+  perks: string[],
+  extraInfo: string,
+  checkIn: string,
+  checkOut: string,
+  maxGuests: number,
+  price: number,
+}
+
 export default function SinglePlacePage() {
 
-  const {id} = useParams();
+  const {name} = useParams();
   const [ready,setReady] = useState<boolean>(false);
-  const [place,setPlace] = useState<object>({
+  const [place,setPlace] = useState<Place>({
     title: '',
     address: '',
     addedPhotos: [],
@@ -16,26 +29,28 @@ export default function SinglePlacePage() {
     checkIn: '',
     checkOut: '',
     maxGuests: 0,
-    price: 0.0,
+    price: 0,  
   });
 
   async function setData(){
-    const {data} = await axios.get('/places'+id);
-    setPlace(data);
+    const {data} = await axios.get('/places/'+name);
+    console.log(data);
+    await setPlace(data);
+    console.log(place);
   }
 
   useEffect(() => {
     setData();
     setReady(true);
   }, []);
-
+ 
   if(!(ready)) {
     return "Loading...";
   }
 
   return (
     <div>
-      {place?.title}
+      {place.title}
     </div>
   );
 }

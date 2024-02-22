@@ -8,6 +8,9 @@ import addtitleReducer from "./slices/form/addtitleSlice";
 import descriptionReducer from "./slices/form/descriptionSlice";
 import extrainfoReducer from "./slices/form/extrainfoSlice";
 import priceReducer from "./slices/form/priceSlice";
+import alertReducer from "./slices/alertSlice";
+import redirectReducer from "./slices/redirectSlice";
+import photosRemovedReducer from "./slices/form/photosRemovedSlice"
 //import { persistReducer, persistStore } from "redux-persist";
 //import storage from "redux-persist/lib/storage";
 
@@ -30,6 +33,9 @@ export const store = configureStore({
     description: descriptionReducer,
     extrainfo: extrainfoReducer,
     price: priceReducer,
+    alert: alertReducer,
+    redirect: redirectReducer,
+    photosRemoved: photosRemovedReducer,
     //persistData: persistedReducer,
   },
   middleware: (getDefaultMiddleware) =>

@@ -1,12 +1,14 @@
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
-import { putNewPhotos, removePhotoRedux, setAddedPhotos, uploadPhotoAsync } from "../../redux/slices/form/photosSlice";
+import { removePhotoRedux, setAddedPhotos, uploadPhotoAsync } from "../../redux/slices/form/photosSlice";
 import { useEffect } from "react";
+import { addPhoto } from "../../redux/slices/form/photosRemovedSlice";
 
 //@ts-ignore
 export default function UploadPhotos({ addedPhotos }) {
 
   const photosRedux = useSelector((state: RootState) => state.photos.photos);
+  const photosRemoved = useSelector((state: RootState) => state.photosRemoved.photosRemoved);
   const dispatch = useDispatch<AppDispatch>();
 
   const uploadPhotos = async (e: any) => {
@@ -29,6 +31,7 @@ export default function UploadPhotos({ addedPhotos }) {
   const removePhoto = (e: any) => {
     e.preventDefault()
     const filename = e.currentTarget.id;
+    dispatch(addPhoto(filename));
     dispatch(removePhotoRedux(filename));
   } 
 

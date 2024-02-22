@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../redux/store.ts";
-import { getPlaces, getUserPlaces } from "../redux/slices/placeSlice.ts";
+import { getUserPlaces } from "../redux/slices/placeSlice.ts";
 import AccountNav from "../components/AccountNav.tsx";
 import PlacesForm from "../components/PlacesForm.tsx";
 import axios from "axios";
+import { setRedirectFalse } from "../redux/slices/redirectSlice.ts";
 
 export default function PlacesPage() {
 
@@ -38,6 +39,7 @@ export default function PlacesPage() {
 	}
 
 	useEffect(() => {
+		dispatch(setRedirectFalse());
 		getListPlaces();
 		if (!id  || id == "new") {
 			setReady(true);

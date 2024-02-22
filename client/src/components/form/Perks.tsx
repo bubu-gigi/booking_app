@@ -4,7 +4,7 @@ import { addPerk, removePerk } from "../../redux/slices/form/perksSlice";
 import { useEffect } from "react";
 
 //@ts-ignore
-export default function Perks( {perks} ) {
+export default function Perks( {perks=[]} ) {
 
   const dispatch = useDispatch<AppDispatch>();
   const perksRedux = useSelector((state: RootState) => state.perks.perks);

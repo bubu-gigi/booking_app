@@ -16,7 +16,7 @@ export default function AddressTitle( { address, title } ) {
   function inputDescription(text: string): any{
       return (
           <p className="text-gray-500 text-sm">{text}</p>
-      );
+      );				
   }
   function preInput(header: string,description: string): any{
     return (
@@ -51,9 +51,9 @@ export default function AddressTitle( { address, title } ) {
   return(
     <>
       {preInput('Title', 'Title for your place, should be short and cathcy')}
-      <input type="text" name="title" defaultValue={title} onChange={handleOnChange} placeholder="title, for example my lovely app"/>
+      <input type="text" name="title" defaultValue={title} onChange={handleOnChange} placeholder="title, for example my lovely app" required/>
       {preInput('Address', 'Address to this place')}                        
-      <input type="text" name="address" defaultValue={address} onChange={handleOnChange} placeholder="address"/>
+      <input type="text" name="address" defaultValue={address} onChange={handleOnChange} placeholder="address" required/>
     </>
   );
 }

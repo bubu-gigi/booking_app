@@ -21,51 +21,56 @@ const initialState = {
 const placeSlice = createSlice({
   name: "place",
   initialState,
-  reducers:{
+  reducers: {
+    setPlace: (state, action) => {
+      state.places = [];
+      state.places.push(action.payload);
+    }
   },
   extraReducers: (builder) => {
-    builder.addCase(addNewPlace.pending, ()=> {
+    builder.addCase(addNewPlace.pending, () => {
       //console.log("pending");
     }).addCase(addNewPlace.rejected, () => {
       console.log("error");
-    }).addCase(addNewPlace.fulfilled, (state,action) => {
+    }).addCase(addNewPlace.fulfilled, (state, action) => {
       console.log(action.payload);
     }),
 
-    builder.addCase(getUserPlaces.pending, () => {
-      //console.log("pending");
-    }).addCase(getUserPlaces.rejected, () => {
-      console.error("error");
-    }).addCase(getUserPlaces.fulfilled, (state, action) => {
-      //@ts-ignore
-      const places = action.payload ?.data as string[];
-      state.places = [];
-      places.map((place) => {
+      builder.addCase(getUserPlaces.pending, () => {
+        //console.log("pending");
+      }).addCase(getUserPlaces.rejected, () => {
+        console.error("error");
+      }).addCase(getUserPlaces.fulfilled, (state, action) => {
         //@ts-ignore
-        state.places.push(place);
-      });
-    }),
+        const places = action.payload?.data as string[];
+        state.places = [];
+        places.map((place) => {
+          //@ts-ignore
+          state.places.push(place);
+        });
+      }),
 
-    builder.addCase(updatePlace.pending, () => {
-      //console.log("pending");
-    }).addCase(updatePlace.rejected, () => {
-      console.error("error");
-    }).addCase(updatePlace.fulfilled, (state,action) => {
-      state.places = [];
-      state.places.push(action.payload);
-    }),
+      builder.addCase(updatePlace.pending, () => {
+        //console.log("pending");
+      }).addCase(updatePlace.rejected, () => {
+        console.error("error");
+      }).addCase(updatePlace.fulfilled, (state, action) => {
+        state.places = [];
+        //@ts-ignore
+        state.places.push(action.payload);
+      }),
 
-    builder.addCase(getPlaces.pending, () => {
-      //console.log("pending");
-    }).addCase(getPlaces.rejected, () => {
-      console.error("error");
-    }).addCase(getPlaces.fulfilled, (state,action) => {
-      state.places = [];
-      //@ts-ignore
-      const {data} = action.payload as string[];
-      //@ts-ignore
-      state.places = data;
-    })
+      builder.addCase(getPlaces.pending, () => {
+        //console.log("pending");
+      }).addCase(getPlaces.rejected, () => {
+        console.error("error");
+      }).addCase(getPlaces.fulfilled, (state, action) => {
+        state.places = [];
+        //@ts-ignore
+        const { data } = action.payload as string[];
+        //@ts-ignore
+        state.places = data;
+      })
 
     builder.addCase(getPlace.pending, () => {
       //console.log("pending");
@@ -73,7 +78,7 @@ const placeSlice = createSlice({
       console.error("error");
     }).addCase(getPlace.fulfilled, (state, action) => {
       //@ts-ignore
-      const {data} = action.payload;
+      const { data } = action.payload;
       state.places.push(data);
     })
   }
@@ -81,7 +86,7 @@ const placeSlice = createSlice({
 
 export const addNewPlace = createAsyncThunk(
   "place/addNewPlace",
-  async(place: object) => {
+  async (place: object) => {
     try {
       const response = axios.post("/places", place);
       return response;
@@ -93,11 +98,11 @@ export const addNewPlace = createAsyncThunk(
 
 export const getUserPlaces = createAsyncThunk(
   "places/getUserPlaces",
-  async() => {
+  async () => {
     try {
       const response = axios.get("/user-places");
       return response;
-    } catch (e) { 
+    } catch (e) {
       console.error(e);
     }
   }
@@ -105,10 +110,27 @@ export const getUserPlaces = createAsyncThunk(
 
 export const updatePlace = createAsyncThunk(
   "places/updatePlace",
-  async(place: object) => {
+  async (obj: object) => {
     try {
       //@ts-ignore
-      const {data} = await axios.put("/places/"+place ?._id, place);
+      const{ title,address,addedPhotos,description, perks, extraInfo, checkIn, checkOut, maxGuests, price, photosRemoved} = obj;
+      //@ts-ignore
+      const place = {
+        title: title,
+        address: address,
+        addedPhotos: addedPhotos,
+        description: description,
+        perks: perks,
+        extraInfo: extraInfo,
+        checkIn: checkIn,
+        checkOut: checkOut,
+        maxGuests: maxGuests,
+        price: price,
+      }
+      //@ts-ignore
+      const { data } = await axios.put("/places/" + obj?._id, place);
+      //@ts-ignore
+      const { data:response } = await axios.post('/remove-photos', photosRemoved);
       return data;
     } catch (e) {
       console.error(e);
@@ -118,7 +140,7 @@ export const updatePlace = createAsyncThunk(
 
 export const getPlaces = createAsyncThunk(
   "places/getPlaces",
-  async() => {
+  async () => {
     try {
       const response = await axios.get("/places");
       return response;
@@ -130,7 +152,7 @@ export const getPlaces = createAsyncThunk(
 
 export const getPlace = createAsyncThunk(
   "place/getPlace",
-  async(id: string) => {
+  async (id: string) => {
     try {
       const response = await axios.get("/places/" + id);
       return response;
@@ -139,5 +161,7 @@ export const getPlace = createAsyncThunk(
     }
   }
 )
+
+export const { setPlace } = placeSlice.actions;
 
 export default placeSlice.reducer;
